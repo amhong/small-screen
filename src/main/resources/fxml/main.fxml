@@ -22,7 +22,7 @@
                <Font size="96.0"/>
            </font>
        </Label>
-       <Label fx:id="stat" text="进23人  出20人" textFill="WHITE">
+       <Label fx:id="stat" textFill="WHITE">
            <font>
                <Font size="96.0"/>
            </font>

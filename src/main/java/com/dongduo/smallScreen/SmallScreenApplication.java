@@ -1,8 +1,10 @@
 package com.dongduo.smallScreen;
 
+import com.dongduo.smallScreen.simulator.SimulatorGClient;
 import com.dongduo.smallScreen.view.MainView;
 import com.gg.reader.api.dal.GClient;
 import de.felixroske.jfxsupport.AbstractJavaFxApplicationSupport;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -15,7 +17,7 @@ public class SmallScreenApplication extends AbstractJavaFxApplicationSupport {
     }
 
     @Bean
-    public GClient client() {
-        return new GClient();
+    public GClient client(@Value("${gate.simulator}") boolean simulator) {
+        return simulator ? new SimulatorGClient() : new GClient();
     }
 }

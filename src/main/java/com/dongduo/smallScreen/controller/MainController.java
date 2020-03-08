@@ -7,11 +7,14 @@ import com.gg.reader.api.protocol.gx.LogAppGpiOver;
 import com.gg.reader.api.protocol.gx.LogAppGpiStart;
 import de.felixroske.jfxsupport.AbstractJavaFxApplicationSupport;
 import de.felixroske.jfxsupport.FXMLController;
+import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -23,7 +26,7 @@ import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @FXMLController
-public class MainController implements Initializable {
+public class MainController implements Initializable, DisposableBean {
     private static final Logger logger = LoggerFactory.getLogger(MainController.class);
     private static final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("今天是yyyy年M月d日");
 
@@ -48,6 +51,7 @@ public class MainController implements Initializable {
     static AtomicInteger inCount = new AtomicInteger(0);//进计数
     static AtomicInteger outCount = new AtomicInteger(0);//出计数
 
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         AbstractJavaFxApplicationSupport.getStage().setFullScreen(true);
@@ -60,6 +64,12 @@ public class MainController implements Initializable {
             logger.error("通道门连接失败！");
             date.setText("通道门连接失败！");
         }
+    }
+
+    @Override
+    public void destroy() {
+        client.close();
+        System.out.println("通道门连接已断开！");
     }
 
     @Scheduled(cron="1 0 0 * * ?")
@@ -117,6 +127,8 @@ public class MainController implements Initializable {
     }
 
     private void refreshStat() {
-        stat.setText(String.format("进%d人  出%d人", inCount.get(), outCount.get()));
+        Platform.runLater(()-> {
+            stat.setText(String.format("进%d人  出%d人", inCount.get(), outCount.get()));
+        });
     }
 }
