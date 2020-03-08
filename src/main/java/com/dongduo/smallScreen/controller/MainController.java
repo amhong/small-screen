@@ -1,13 +1,12 @@
 package com.dongduo.smallScreen.controller;
 
+import com.dongduo.smallScreen.entity.Stat;
+import com.dongduo.smallScreen.repository.StatRepository;
 import com.gg.reader.api.dal.GClient;
-import com.gg.reader.api.dal.HandlerGpiOver;
 import com.gg.reader.api.dal.HandlerGpiStart;
-import com.gg.reader.api.protocol.gx.LogAppGpiOver;
 import com.gg.reader.api.protocol.gx.LogAppGpiStart;
 import de.felixroske.jfxsupport.AbstractJavaFxApplicationSupport;
 import de.felixroske.jfxsupport.FXMLController;
-import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -22,13 +21,15 @@ import org.springframework.scheduling.annotation.Scheduled;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @FXMLController
 public class MainController implements Initializable, DisposableBean {
     private static final Logger logger = LoggerFactory.getLogger(MainController.class);
-    private static final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("今天是yyyy年M月d日");
+    private static final DateTimeFormatter dtf1 = DateTimeFormatter.ofPattern("今天是yyyy年M月d日");
+    private static final DateTimeFormatter dtf2 = DateTimeFormatter.ofPattern("yyyyMMdd");
 
     @Value("${gate.endpoint}")
     private String gateEndpoint;
@@ -40,12 +41,16 @@ public class MainController implements Initializable, DisposableBean {
     @Autowired
     private GClient client;
 
+    @Autowired
+    private StatRepository statRepository;
+
     @FXML
     private Label date;
 
     @FXML
     private Label stat;
 
+    static int statDate = 0;
     static long inTime = 0;//进触发时间
     static long outTime = 0;//出触发时间
     static AtomicInteger inCount = new AtomicInteger(0);//进计数
@@ -57,7 +62,15 @@ public class MainController implements Initializable, DisposableBean {
         AbstractJavaFxApplicationSupport.getStage().setFullScreen(true);
         if (client.openTcp(gateEndpoint, 2000)) {
             logger.info("通道门连接成功！");
-            date.setText(LocalDateTime.now().format(dtf));
+            LocalDateTime now = LocalDateTime.now();
+            date.setText(now.format(dtf1));
+            statDate = Integer.valueOf(now.format(dtf2));
+            Optional<Stat> statOptional = statRepository.findById(statDate);
+            if (statOptional.isPresent()) {
+                Stat stat = statOptional.get();
+                inCount.set(stat.getInCount());
+                outCount.set(stat.getOutCount());
+            }
             refreshStat();
             subscribeHandler(client);
         } else {
@@ -74,7 +87,9 @@ public class MainController implements Initializable, DisposableBean {
 
     @Scheduled(cron="1 0 0 * * ?")
     public void reset() {
-        date.setText(LocalDateTime.now().format(dtf));
+        LocalDateTime now = LocalDateTime.now();
+        date.setText(now.format(dtf1));
+        statDate = Integer.valueOf(now.format(dtf2));
         inCount.set(0);
         outCount.set(0);
     }
@@ -94,6 +109,7 @@ public class MainController implements Initializable, DisposableBean {
                                 outCount.set(outCount.addAndGet(1));
                                 logger.info("---------出--"+outCount.get()+"---------");
                                 refreshStat();
+                                saveStat();
                                 inTime = 0;
                                 outTime = 0;
                             }
@@ -108,6 +124,7 @@ public class MainController implements Initializable, DisposableBean {
                                 inCount.set(inCount.addAndGet(1));
                                 logger.info("---------进--"+inCount.get()+"---------");
                                 refreshStat();
+                                saveStat();
                                 inTime = 0;
                                 outTime = 0;
                             }
@@ -130,5 +147,9 @@ public class MainController implements Initializable, DisposableBean {
         Platform.runLater(()-> {
             stat.setText(String.format("进%d人  出%d人", inCount.get(), outCount.get()));
         });
+    }
+
+    private void saveStat() {
+        statRepository.save(new Stat(statDate, inCount.get(), outCount.get()));
     }
 }
