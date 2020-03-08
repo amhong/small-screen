@@ -8,13 +8,10 @@
 	<version>1.0.0</version>
 	<packaging>jar</packaging>
 
-	<name>acs</name>
-	<description>Access Control System</description>
-
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>1.5.9.RELEASE</version>
+		<version>2.2.4.RELEASE</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 
@@ -30,14 +27,14 @@
 			<artifactId>spring-boot-starter</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>de.roskenet</groupId>
+			<artifactId>springboot-javafx-support</artifactId>
+			<version>2.1.6</version>
+		</dependency>
+		<dependency>
 			<groupId>com.gg.reader</groupId>
 			<artifactId>greader-api</artifactId>
 			<version>1.0</version>
-		</dependency>
-		<dependency>
-			<groupId>com.alibaba</groupId>
-			<artifactId>fastjson</artifactId>
-			<version>1.2.47</version>
 		</dependency>
 	</dependencies>
 
