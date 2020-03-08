@@ -71,7 +71,7 @@ public class MainController implements Initializable, DisposableBean {
                 inCount.set(stat.getInCount());
                 outCount.set(stat.getOutCount());
             }
-            refreshStat();
+            stat.setText(String.format("进%d人  出%d人", inCount.get(), outCount.get()));
             subscribeHandler(client);
         } else {
             logger.error("通道门连接失败！");
@@ -88,7 +88,9 @@ public class MainController implements Initializable, DisposableBean {
     @Scheduled(cron="1 0 0 * * ?")
     public void reset() {
         LocalDateTime now = LocalDateTime.now();
-        date.setText(now.format(dtf1));
+        Platform.runLater(()-> {
+            date.setText(now.format(dtf1));
+        });
         statDate = Integer.valueOf(now.format(dtf2));
         inCount.set(0);
         outCount.set(0);
