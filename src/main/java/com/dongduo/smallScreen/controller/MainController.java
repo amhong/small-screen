@@ -8,9 +8,12 @@ import com.gg.reader.api.protocol.gx.LogAppGpiStart;
 import de.felixroske.jfxsupport.AbstractJavaFxApplicationSupport;
 import de.felixroske.jfxsupport.FXMLController;
 import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
+import javafx.scene.input.MouseEvent;
+import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
@@ -50,6 +53,9 @@ public class MainController implements Initializable, DisposableBean {
     @FXML
     private Label stat;
 
+    @FXML
+    private Label esc;
+
     static int statDate = 0;
     static long inTime = 0;//进触发时间
     static long outTime = 0;//出触发时间
@@ -59,7 +65,8 @@ public class MainController implements Initializable, DisposableBean {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        AbstractJavaFxApplicationSupport.getStage().setFullScreen(true);
+        Stage stage = AbstractJavaFxApplicationSupport.getStage();
+        stage.setFullScreen(true);
         if (client.openTcp(gateEndpoint, 2000)) {
             logger.info("通道门连接成功！");
             LocalDateTime now = LocalDateTime.now();
@@ -73,6 +80,11 @@ public class MainController implements Initializable, DisposableBean {
             }
             stat.setText(String.format("进%d人  出%d人", inCount.get(), outCount.get()));
             subscribeHandler(client);
+            esc.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 3) {
+                    stage.setFullScreen(!stage.isFullScreen());
+                }
+            });
         } else {
             logger.error("通道门连接失败！");
             date.setText("通道门连接失败！");
@@ -135,14 +147,6 @@ public class MainController implements Initializable, DisposableBean {
                 }
             }
         };
-
-//        client.onGpiOver = new HandlerGpiOver() {
-//            public void log(String s, LogAppGpiOver logAppGpiOver) {
-//                if (null != logAppGpiOver) {
-//                    System.out.println(logAppGpiOver);
-//                }
-//            }
-//        };
     }
 
     private void refreshStat() {

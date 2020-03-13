@@ -1,31 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
 
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.text.Font?>
-<AnchorPane prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.dongduo.smallScreen.controller.MainController">
-    <ImageView AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
+<AnchorPane prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/10.0.2-internal"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.dongduo.smallScreen.controller.MainController">
+    <ImageView AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0"
+               AnchorPane.topAnchor="0">
         <image>
-            <Image url="@../static/img/bg.jpg" />
+            <Image url="@../static/img/bg.jpg"/>
         </image>
     </ImageView>
-   <VBox alignment="CENTER" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
-       <Label text="欢迎光临" textFill="WHITE">
-           <font>
-               <Font size="128.0"/>
-           </font>
-       </Label>
-       <Label fx:id="date" textFill="WHITE">
-           <font>
-               <Font size="96.0"/>
-           </font>
-       </Label>
-       <Label fx:id="stat" textFill="WHITE">
-           <font>
-               <Font size="96.0"/>
-           </font>
-       </Label>
-   </VBox>
+    <VBox alignment="CENTER" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0"
+          AnchorPane.topAnchor="0">
+        <Label text="欢迎光临" textFill="WHITE">
+            <font>
+                <Font size="128.0"/>
+            </font>
+        </Label>
+        <Label fx:id="date" textFill="WHITE">
+            <font>
+                <Font size="96.0"/>
+            </font>
+        </Label>
+        <Label fx:id="stat" textFill="WHITE">
+            <font>
+                <Font size="96.0"/>
+            </font>
+        </Label>
+    </VBox>
+    <Label fx:id="esc" text="      ">
+        <font>
+            <Font size="180.0"/>
+        </font>
+    </Label>
 </AnchorPane>
