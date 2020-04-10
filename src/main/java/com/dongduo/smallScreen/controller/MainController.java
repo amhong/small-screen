@@ -2,6 +2,7 @@ package com.dongduo.smallScreen.controller;
 
 import com.dongduo.smallScreen.entity.Stat;
 import com.dongduo.smallScreen.repository.StatRepository;
+import com.dongduo.smallScreen.util.HttpUtil;
 import com.gg.reader.api.dal.GClient;
 import com.gg.reader.api.dal.HandlerGpiStart;
 import com.gg.reader.api.protocol.gx.LogAppGpiStart;
@@ -24,6 +25,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -40,6 +43,9 @@ public class MainController implements Initializable, DisposableBean {
     //两组红外探测器响应的间隔时间
     @Value("${gate.gpi.interval}")
     private long interval;
+
+    @Value("${upload.url}")
+    private String uploadUrl;
 
     @Autowired
     private GClient client;
@@ -124,6 +130,7 @@ public class MainController implements Initializable, DisposableBean {
                                 logger.info("---------出--"+outCount.get()+"---------");
                                 refreshStat();
                                 saveStat();
+                                uploadStat();
                                 inTime = 0;
                                 outTime = 0;
                             }
@@ -139,6 +146,7 @@ public class MainController implements Initializable, DisposableBean {
                                 logger.info("---------进--"+inCount.get()+"---------");
                                 refreshStat();
                                 saveStat();
+                                uploadStat();
                                 inTime = 0;
                                 outTime = 0;
                             }
@@ -157,5 +165,17 @@ public class MainController implements Initializable, DisposableBean {
 
     private void saveStat() {
         statRepository.save(new Stat(statDate, inCount.get(), outCount.get()));
+    }
+
+    private void uploadStat() {
+        Map<String, String> param = new HashMap<>();
+        param.put("inNum", String.valueOf(inCount.get()));
+        param.put("outNum", String.valueOf(outCount.get()));
+        try {
+            HttpUtil.doGet(uploadUrl, param);
+        } catch (Exception e) {
+            logger.error("上传人数统计出错。", e);
+        }
+
     }
 }

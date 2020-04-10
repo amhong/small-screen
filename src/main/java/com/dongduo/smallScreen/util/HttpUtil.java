@@ -20,7 +20,7 @@ public class HttpUtil {
 
     private static final String METHOD_GET = "GET";
 
-    private static final int CONNECTTIMEOUT = 5000;
+    private static final int CONNECTTIMEOUT = 1000;
 
     private static final int READTIMEOUT = 5000;
 
