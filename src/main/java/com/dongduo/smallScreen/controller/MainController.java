@@ -47,6 +47,9 @@ public class MainController implements Initializable, DisposableBean {
     @Value("${upload.url}")
     private String uploadUrl;
 
+    @Value("${upload.enable}")
+    private boolean enableUpload;
+
     @Autowired
     private GClient client;
 
@@ -168,14 +171,15 @@ public class MainController implements Initializable, DisposableBean {
     }
 
     private void uploadStat() {
-        Map<String, String> param = new HashMap<>();
-        param.put("inNum", String.valueOf(inCount.get()));
-        param.put("outNum", String.valueOf(outCount.get()));
-        try {
-            HttpUtil.doGet(uploadUrl, param);
-        } catch (Exception e) {
-            logger.error("上传人数统计出错。", e);
+        if (enableUpload) {
+            Map<String, String> param = new HashMap<>();
+            param.put("inNum", String.valueOf(inCount.get()));
+            param.put("outNum", String.valueOf(outCount.get()));
+            try {
+                HttpUtil.doGet(uploadUrl, param);
+            } catch (Exception e) {
+                logger.error("上传人数统计出错。", e);
+            }
         }
-
     }
 }
