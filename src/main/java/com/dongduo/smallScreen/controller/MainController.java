@@ -2,6 +2,7 @@ package com.dongduo.smallScreen.controller;
 
 import com.dongduo.smallScreen.entity.Stat;
 import com.dongduo.smallScreen.repository.StatRepository;
+import com.dongduo.smallScreen.service.MainService;
 import com.dongduo.smallScreen.util.HttpUtil;
 import com.gg.reader.api.dal.GClient;
 import com.gg.reader.api.dal.HandlerGpiStart;
@@ -20,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import java.net.URL;
@@ -44,17 +46,14 @@ public class MainController implements Initializable, DisposableBean {
     @Value("${gate.gpi.interval}")
     private long interval;
 
-    @Value("${upload.url}")
-    private String uploadUrl;
-
-    @Value("${upload.enable}")
-    private boolean enableUpload;
-
     @Autowired
     private GClient client;
 
     @Autowired
     private StatRepository statRepository;
+
+    @Autowired
+    private MainService mainService;
 
     @FXML
     private Label date;
@@ -133,7 +132,7 @@ public class MainController implements Initializable, DisposableBean {
                                 logger.info("---------出--"+outCount.get()+"---------");
                                 refreshStat();
                                 saveStat();
-                                uploadStat();
+                                mainService.uploadStat(inCount.get(), outCount.get());
                                 inTime = 0;
                                 outTime = 0;
                             }
@@ -149,7 +148,7 @@ public class MainController implements Initializable, DisposableBean {
                                 logger.info("---------进--"+inCount.get()+"---------");
                                 refreshStat();
                                 saveStat();
-                                uploadStat();
+                                mainService.uploadStat(inCount.get(), outCount.get());
                                 inTime = 0;
                                 outTime = 0;
                             }
@@ -166,20 +165,7 @@ public class MainController implements Initializable, DisposableBean {
         });
     }
 
-    private void saveStat() {
+    public void saveStat() {
         statRepository.save(new Stat(statDate, inCount.get(), outCount.get()));
-    }
-
-    private void uploadStat() {
-        if (enableUpload) {
-            Map<String, String> param = new HashMap<>();
-            param.put("inNum", String.valueOf(inCount.get()));
-            param.put("outNum", String.valueOf(outCount.get()));
-            try {
-                HttpUtil.doGet(uploadUrl, param);
-            } catch (Exception e) {
-                logger.error("上传人数统计出错。", e);
-            }
-        }
     }
 }
